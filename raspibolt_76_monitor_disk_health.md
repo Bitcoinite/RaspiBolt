@@ -1,0 +1,154 @@
+---
+layout: default
+title: Monitor disk health
+parent: Bonus Section
+nav_order: 45
+has_toc: false
+---
+## Bonus guide: Automatic monitoring of the external disk health
+*Difficulty: easy*
+
+[Smartmontools](https://www.smartmontools.org/) is a package that contains the `smartctl` utility. It allows to monitor modern storage devices using their built-in Self-monitoring, Analysis and Reporting Technology System (SMART).
+This guide explains how to install and use the `smartctl` utility and how to set up regular checks and issue notifications using a bash script and crontab.
+
+#### *Risk : none* 
+
+#### *Requirements: none*
+
+## Installation and preparations
+
+* Install and then check the version
+
+```bash
+$ sudo apt install smartmontools
+$ smartctl -V
+```
+
+* Let's check some information about our device. 
+If you've followed the guide, your drive should be at `/dev/sda`. 
+We can check this by listing all the devices connected to the Pi
+
+```bash
+$ lsblk
+>NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+>sda           8:0    0 931.5G  0 disk
+>__sda1        8:1    0 931.5G  0 part /mnt/ext
+>mmcblk0     179:0    0 119.3G  0 disk
+>__blk0p1 179:1    0   256M  0 part /boot
+>__blk0p2 179:2    0   119G  0 part /
+```
+
+* We can now get some information about this device. 
+The report should tell us that the device supports SMART capability and that it is enabled
+
+```bash
+$ sudo smartctl -i /dev/sda
+>...
+>Device is:        Not in smartctl database [for details use: -P showall]
+>...
+>SMART support is: Available - device has SMART capability.
+>SMART support is: Enabled
+```
+
+* We need to know the device type, for this we can use the scanning tool
+It scans for devices and prints each device name, device type and protocol
+The device type will be between brackets, it will probably be [SAT] (for SATA)
+
+```bash
+$ smartctl --scan
+>/dev/sda -d sat # /dev/sda [SAT], ATA device
+```
+
+* We can now do a quick health info. 
+-d specifies the type of device as found above, so sat for SATA; 
+-H check the device to report its SMART 'Health' status.
+The test should show PASSED.
+
+```bash
+$ sudo smartctl -d sat -H /dev/sda
+>=== START OF READ SMART DATA SECTION ===
+>SMART overall-health self-assessment test result: PASSED
+```
+
+* We can get more information of individual attributes used for the test. 
+This will list various attributes and give them a score based on online tests. 
+The attribute to look at are #5 Reallocated_Sector_Ct, #187 Reported_Uncorrest, and #233 Media_Wearout_Indicator.
+VALUES go from a score of 0 (worst) to 100 (best). We want RAW_VALUES for #5 and 187 to be 0.
+```bash
+$ sudo smartctl -a /dev/sda
+
+* If you want to read more about Smartmontools utilities and their options, you can read the manual: `$ man smartctl`
+
+## Regular health check and logging the results
+
+Now we will create a bash script to run the test and log the results together with a timestamp.
+
+* With the admin user, create a file with the `nano` text editor and paste the following text
+
+```bash
+$ nano ssd_smartmon.sh
+```
+
+```ini
+#!/usr/bin/bash
+
+# the script exits when a command fails
+set -o errexit
+# the script exits when a variable is undeclared
+set -o nounset
+
+# we create a log file named ssd_smartmon-$1.log, with $1 the name of the device we want to check (sda in our case)
+## the log will start with a timestamp
+date > /tmp/ssd_smartmon-$1.log
+# the second line is the overall result of the SMART Health chech
+sudo smartctl -d sat -H /dev/$1 | grep -i overall >> /tmp/ssd_smartmon-$1.log
+# the next four lines of the log are key attributes from a SMART check
+sudo smartctl -d sat -a /dev/$1 | grep -i -E 'attribute_name|reallocated|reported|wearout'>> /tmp/ssd_smartmon-$1.log
+# the last six lines show the error log version and the logged errors
+sudo smartctl -d sat -l error /dev/$1 >> /tmp/ssd_smartmon-$1.log
+```
+* We now need to make the file executable. 
+Once executable, the file name should appear with a green color.
+
+```bash
+$ chmod +x ssd_smartmon.sh
+$ ls -la
+```
+
+* Let's test our script is working by executing it and looking at the log. We execute the script with the argument `sda`.
+
+```bash
+$ ./ssd_smartmon.sh sda
+$ cat /tmp/ssd_smartmon_log-sda
+>Thu  7 Oct 12:27:09 BST 2021
+>SMART overall-health self-assessment test result: PASSED
+>ID# ATTRIBUTE_NAME          FLAG     VALUE WORST THRESH TYPE      UPDATED  WHEN_FAILED RAW_VALUE
+>5 Reallocated_Sector_Ct   0x0032   100   100   000    Old_age   Always       -       0
+>187 Reported_Uncorrect      0x0032   100   100   000    Old_age   Always       -       0
+>233 Media_Wearout_Indicator 0x0032   100   100   ---    Old_age   Always       -       1123
+>smartctl 6.6 2017-11-05 r4594 [aarch64-linux-5.10.52-v8+] (local build)
+>Copyright (C) 2002-17, Bruce Allen, Christian Franke, www.smartmontools.org
+>
+>=== START OF READ SMART DATA SECTION ===
+>SMART Error Log Version: 1
+>No Errors Logged
+```
+
+## Regular script execution
+
+Now we can edit the admin user crontab to run the script every hours for example.
+
+* Open the admin user crontab and add the following lines at the end of the file
+
+```bash
+$ crontab -e
+```
+
+```ini
+# simple smart checks everyday
+0 0 * * * /home/admin/smartmonitor sda
+```
+
+## Notifications of issues
+
+TBD
