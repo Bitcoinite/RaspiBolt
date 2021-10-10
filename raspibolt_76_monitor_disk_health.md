@@ -125,8 +125,46 @@ $ sudo smartctl -l selftest /dev/sda
 
 ### Setting up the mailbox and email utility
 
+To send an email notification we will use `msmtp`, a light SMTP client that is able to send emails to a third-party SMTP server.  
+
 * Install msmtp
 
+```bash
+$ sudo apt-get update
+$ sudo apt-get install msmtp
+```
+
+We will use a configuration file specific to the admin user and paste the following settings
+
+```bash
+$ cd ~/
+$ nano .msmtprc
+```
+
+```ini
+# Set default values
+defaults
+auth on
+tls on
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+logfile /var/log/msmtp.log
+
+# Gmail configuration
+account gmail
+host smtp.gmail.com
+port 587
+from <your-username>@gmail.com
+user <your_username>
+passwordeval app-specific-password
+
+# Set a default account
+account default : gmail
+```
+
+* We need to setup the app-specfic password in our dedicated gmail account.
+* Follow this link: [https://myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
+* Log in
+* Security > Less secure app access > Turn off
 
 * 
 * Open the smartd configuration file
