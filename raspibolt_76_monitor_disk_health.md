@@ -8,8 +8,8 @@ has_toc: false
 ## Bonus guide: Automatic monitoring of the external disk health
 *Difficulty: easy*
 
-[Smartmontools](https://www.smartmontools.org/) is a package that contains the `smartctl` utility. It allows to monitor modern storage devices using their built-in Self-monitoring, Analysis and Reporting Technology System (SMART).
-This guide explains how to install and use the `smartctl` utility and how to set up regular checks and issue notifications using a bash script and crontab.
+[Smartmontools](https://www.smartmontools.org/) is a package that contains the `smartctl` and `smartd` utilities. It allows to monitor modern storage devices using their built-in Self-monitoring, Analysis and Reporting Technology System (SMART).
+This guide explains how to install and use the `smartctl` utility and how to set up regular checks and issue notifications using the `smartd` daemon.
 
 #### *Risk : none* 
 
@@ -38,13 +38,11 @@ $ lsblk
 >__blk0p2 179:2    0   119G  0 part /
 ```
 
-* We can now get some information about this device. 
+* We can now get some information about this device using the --info (or -i) option. 
 The report should tell us that the device supports SMART capability and that it is enabled
 
 ```bash
 $ sudo smartctl -i /dev/sda
->...
->Device is:        Not in smartctl database [for details use: -P showall]
 >...
 >SMART support is: Available - device has SMART capability.
 >SMART support is: Enabled
@@ -60,9 +58,9 @@ $ smartctl --scan
 ```
 
 * We can now do a quick health info. 
--d specifies the type of device as found above, so sat for SATA; 
--H check the device to report its SMART 'Health' status.
-The test should show PASSED.
+--device (or -d) specifies the type of device as found above, so sat for SATA; 
+--health (or -H)  checks the device to report its SMART 'Health' status.
+The test should show the result PASSED.
 
 ```bash
 $ sudo smartctl -d sat -H /dev/sda
@@ -71,26 +69,81 @@ $ sudo smartctl -d sat -H /dev/sda
 ```
 
 * We can get more information of individual attributes used for the test. 
-This will list various attributes and give them a score based on online tests. 
+--all (or -a) will list various attributes and give them a score based on online tests. 
 The attribute to look at are #5 Reallocated_Sector_Ct, #187 Reported_Uncorrest, and #233 Media_Wearout_Indicator.
 VALUES go from a score of 0 (worst) to 100 (best). We want RAW_VALUES for #5 and 187 to be 0.
 ```bash
 $ sudo smartctl -a /dev/sda
+> [...]
+> ID# ATTRIBUTE_NAME          FLAG     VALUE WORST THRESH TYPE      UPDATED  WHEN_FAILED RAW_VALUE
+> 5 Reallocated_Sector_Ct   0x0032   100   100   000    Old_age   Always       -       0
+> [...]
+> 187 Reported_Uncorrect      0x0032   100   100   000    Old_age   Always       -       0
+> [...]
+> 233 Media_Wearout_Indicator 0x0032   100   100   ---    Old_age   Always       -       1141
+> SMART Error Log Version: 1
+> No Errors Logged
+> [...]
+
+* The test above is simply based on the device characteristics (power on hours, temperature, etc) and on reported errors for the past day-to-day activity (reallocated sectors etc). However, tests can be run that specifically checks the electrical and mechanical properties of the disk and also some amount of disk read testing and data verification. The tests can be either a short test (maximum two minutes) or, if the read/verify test is done on the entire disk rather than a small portion of the disk, a long test (several hours).
+To check the estimated duration of each test we can use the --capabilities (or -c) option
+
+```bash
+$ sudo smartctl -c /dev/sda
+> [...]
+> Short self-test routine 
+recommended polling time:        (   2) minutes.
+> Extended self-test routine
+recommended polling time:        ( 182) minutes.
+```
+
+* We can now do a short test that should last 2 minutes or less
+
+```bash
+$ sudo smartctl -t short /dev/sda
+```
+
+* Wait at least two minutes and then check the results.
+If all goes well, we should see a 'Completed without error' status.
+
+```bash
+$ sudo smartctl -l selftest /dev/sda
+> smartctl 6.6 2017-11-05 r4594 [aarch64-linux-5.10.52-v8+] (local build)
+> Copyright (C) 2002-17, Bruce Allen, Christian Franke, www.smartmontools.org
+>
+> === START OF READ SMART DATA SECTION ===
+> SMART Self-test log structure revision number 1
+> Num  Test_Description    Status                  Remaining  LifeTime(hours)  LBA_of_first_error
+> # 1  Short offline       Completed without error       00%      1698         -
+```
 
 * If you want to read more about Smartmontools utilities and their options, you can read the manual: `$ man smartctl`
 
-## Regular health check and logging the results
+## Regular checks using the smartd daemon
 
-Now we will create a bash script to run the test and log the results together with a timestamp.
+`smartd` is a daemon that runs SMART tests on devices very 30 minutes (by default). Here, we will set up `smartd` to run every 30 minutes and an email notification if an issue is detected. 
 
-* With the admin user, create a file with the `nano` text editor and paste the following text
+### Setting up the mailbox and email utility
+
+* Install msmtp
+
+
+* 
+* Open the smartd configuration file
 
 ```bash
-$ nano ssd_smartmon.sh
+$ sudo nano /etc/smartd.conf
 ```
 
+* By default, everything is commented out except one line starting with DEVICESCAN.
+With this keyword, the daemon scans for all existing ATA and SCSI devices, ignoring the rest of the configuration.
+Instead, we want to only look at our sda device, so we comment the line starting with DEVICESCAN and uncomment the line starting with .
+
 ```ini
-#!/usr/bin/bash
+[...]
+#DEVICESCAN -d removable -n standby -m root -M exec /usr/share/smartmontools/smartd-runner
+[...]
+
 
 # the script exits when a command fails
 set -o errexit
