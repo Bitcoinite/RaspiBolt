@@ -166,7 +166,6 @@ account default : gmail
 * Log in
 * Security > Less secure app access > Turn off
 
-* 
 * Open the smartd configuration file
 
 ```bash
@@ -180,6 +179,10 @@ Instead, we want to only look at our sda device, so we comment the line starting
 ```ini
 [...]
 #DEVICESCAN -d removable -n standby -m root -M exec /usr/share/smartmontools/smartd-runner
+
+#/dev/sda -a -m destination.email@gmail.com -M test -s (S/../.././03)
+# Check first disk. Monitor all attributes. Start a short self-test everyday between 3-4am.
+/dev/sda -a -s (S/../.././03)
 [...]
 
 
