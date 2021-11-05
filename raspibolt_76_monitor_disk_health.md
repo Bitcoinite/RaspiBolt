@@ -121,50 +121,9 @@ $ sudo smartctl -l selftest /dev/sda
 
 ## Regular checks using the smartd daemon
 
-`smartd` is a daemon that runs SMART tests on devices very 30 minutes (by default). Here, we will set up `smartd` to run every 30 minutes and an email notification if an issue is detected. 
+`smartd` is a daemon that runs SMART tests on devices very 30 minutes (by default). Here, we will set up `smartd` to run every 30 minutes and will display a summary of the results in the RaspiBolt system overview (motd).
 
 ### Setting up the mailbox and email utility
-
-To send an email notification we will use `msmtp`, a light SMTP client that is able to send emails to a third-party SMTP server.  
-
-* Install msmtp
-
-```bash
-$ sudo apt-get update
-$ sudo apt-get install msmtp
-```
-
-We will use a configuration file specific to the admin user and paste the following settings
-
-```bash
-$ cd ~/
-$ nano .msmtprc
-```
-
-```ini
-# Set default values
-defaults
-auth on
-tls on
-tls_trust_file /etc/ssl/certs/ca-certificates.crt
-logfile /var/log/msmtp.log
-
-# Gmail configuration
-account gmail
-host smtp.gmail.com
-port 587
-from <your-username>@gmail.com
-user <your_username>
-passwordeval app-specific-password
-
-# Set a default account
-account default : gmail
-```
-
-* We need to setup the app-specfic password in our dedicated gmail account.
-* Follow this link: [https://myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
-* Log in
-* Security > Less secure app access > Turn off
 
 * Open the smartd configuration file
 
@@ -201,6 +160,7 @@ sudo smartctl -d sat -a /dev/$1 | grep -i -E 'attribute_name|reallocated|reporte
 # the last six lines show the error log version and the logged errors
 sudo smartctl -d sat -l error /dev/$1 >> /tmp/ssd_smartmon-$1.log
 ```
+
 * We now need to make the file executable. 
 Once executable, the file name should appear with a green color.
 
@@ -217,7 +177,7 @@ $ cat /tmp/ssd_smartmon_log-sda
 >Thu  7 Oct 12:27:09 BST 2021
 >SMART overall-health self-assessment test result: PASSED
 >ID# ATTRIBUTE_NAME          FLAG     VALUE WORST THRESH TYPE      UPDATED  WHEN_FAILED RAW_VALUE
->5 Reallocated_Sector_Ct   0x0032   100   100   000    Old_age   Always       -       0
+>5 Reallocated_Sector_Ct     0x0032   100   100   000    Old_age   Always       -       0
 >187 Reported_Uncorrect      0x0032   100   100   000    Old_age   Always       -       0
 >233 Media_Wearout_Indicator 0x0032   100   100   ---    Old_age   Always       -       1123
 >smartctl 6.6 2017-11-05 r4594 [aarch64-linux-5.10.52-v8+] (local build)
