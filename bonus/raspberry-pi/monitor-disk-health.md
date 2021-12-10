@@ -1,51 +1,73 @@
 ---
 layout: default
-title: Monitor disk health
-parent: Bonus Section
-nav_order: 45
+title: Monitor Disk Health
+parent: + Raspberry Pi
+grand_parent: Bonus Section
+nav_exclude: true
 has_toc: false
 ---
-## Bonus guide: Automatic monitoring of the external disk health
-*Difficulty: easy*
 
-[Smartmontools](https://www.smartmontools.org/) is a package that contains the `smartctl` and `smartd` utilities. It allows to monitor modern storage devices using their built-in Self-monitoring, Analysis and Reporting Technology System (SMART).
+## Bonus Guide: Automatic monitoring of the external disk health
+{: .no_toc }
+
+---
+
+[Smartmontools](https://www.smartmontools.org/) is a package that contains the `smartctl` and `smartd` utilities. It allows to monitor modern storage devices using their built-in Self-monitoring, Analysis and Reporting Technology System (SMART).  
+
 This guide explains how to install and use the `smartctl` utility and how to set up regular checks and issue notifications using the `smartd` daemon.
 
-#### *Risk : none* 
+Difficulty: Easy
+{: .label .label-green }
 
-#### *Requirements: none*
+Status: Tested v3
+{: .label .label-green }
 
-## Installation and preparations
+---
 
-* Install and then check the version
+Table of contents
+{: .text-delta }
 
-```bash
-$ sudo apt install smartmontools
-$ smartctl -V
-```
+1. TOC
+{:toc}
 
-* Let's check some information about our device. 
+---
+
+### Requirements
+
+* None
+
+---
+
+### Installation and preparations
+
+* Install smartmontools and check the version
+
+  ```sh
+  $ sudo apt install smartmontools
+  $ smartctl -V
+  > smartctl 7.2 2020-12-30 r5155 [aarch64-linux-5.10.63-v8+] (local build)
+  ```
+
+* Let's check some information about your device. 
 If you've followed the guide, your drive should be at `/dev/sda`. 
-We can check this by listing all the devices connected to the Pi
+Check this by listing all the devices connected to your Pi
 
-```bash
-$ lsblk
->NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
->sda           8:0    0 931.5G  0 disk
->__sda1        8:1    0 931.5G  0 part /mnt/ext
->mmcblk0     179:0    0 119.3G  0 disk
->__blk0p1 179:1    0   256M  0 part /boot
->__blk0p2 179:2    0   119G  0 part /
-```
+  ```sh
+  $ lsblk
+  > NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+  > sda      8:0    0 931.5G  0 disk 
+  > |-sda1   8:1    0   256M  0 part /boot
+  > `-sda2   8:2    0 931.3G  0 part /
+  ```
 
-* We can now get some information about this device using the --info (or -i) option. 
-The report should tell us that the device supports SMART capability and that it is enabled
+* Get some information about this device using the --info (or -i) option. 
+The report should tell you that the device supports SMART capability and that it is enabled
 
 ```bash
 $ sudo smartctl -i /dev/sda
->...
->SMART support is: Available - device has SMART capability.
->SMART support is: Enabled
+> [...]
+> SMART support is: Available - device has SMART capability.
+> SMART support is: Enabled
 ```
 
 * We need to know the device type, for this we can use the scanning tool
