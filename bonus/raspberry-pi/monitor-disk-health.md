@@ -63,7 +63,7 @@ Check this by listing all the devices connected to your Pi
 * Get some information about this device using the --info (or -i) option. 
 The report should tell you that the device supports SMART capability and that it is enabled
 
-  ```bash
+  ```sh
   $ sudo smartctl -i /dev/sda
   > [...]
   > SMART support is: Available - device has SMART capability.
@@ -154,12 +154,22 @@ If all goes well, you should see a 'Completed without error' status.
 * First, back up the default configuration file
 
   ```sh
-  $ sudo cp /etc/smartd.conf /etc/smartd.conf.bak
-  $ sudo nano /etc/smartd.conf
-  $ killall -HUP smartd
+  $ sudo su -
+  $ touch /var/log/smartd.conf
+  $ chmod 640 /var/log/smartd.log
   ```
 
-killall -HUP smartd
+  ```sh
+  #
+  :programname, isequal, "smartd" /var/log/smartd.log
+  ```
+  
+  ```sh  
+  $ systemctl restart rsyslog
+  $ sudo cp /etc/smartd.conf /etc/smartd.conf.bak
+  $ sudo nano /etc/smartd.conf
+  $ sudo killall -HUP smartd
+  ```
 
 
 #### Setting up the mailbox and email utility
