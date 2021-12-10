@@ -63,89 +63,106 @@ Check this by listing all the devices connected to your Pi
 * Get some information about this device using the --info (or -i) option. 
 The report should tell you that the device supports SMART capability and that it is enabled
 
-```bash
-$ sudo smartctl -i /dev/sda
-> [...]
-> SMART support is: Available - device has SMART capability.
-> SMART support is: Enabled
-```
+  ```bash
+  $ sudo smartctl -i /dev/sda
+  > [...]
+  > SMART support is: Available - device has SMART capability.
+  > SMART support is: Enabled
+  ```
 
-* We need to know the device type, for this we can use the scanning tool
-It scans for devices and prints each device name, device type and protocol
-The device type will be between brackets, it will probably be [SAT] (for SATA)
+* You need to know the device type, for this we can use the scanning tool.
+It scans for devices and prints each device name, device type and protocol.
+The device type will be between brackets, it will probably be [SAT] (for SATA).
 
-```bash
-$ smartctl --scan
->/dev/sda -d sat # /dev/sda [SAT], ATA device
-```
+  ```sh
+  $ smartctl --scan
+  > /dev/sda -d sat # /dev/sda [SAT], ATA device
+  ```
 
-* We can now do a quick health info. 
---device (or -d) specifies the type of device as found above, so sat for SATA; 
+* You can now do a quick health info.
+--device (or -d) specifies the type of device as found above, so 'sat' for SATA; 
 --health (or -H)  checks the device to report its SMART 'Health' status.
 The test should show the result PASSED.
 
-```bash
-$ sudo smartctl -d sat -H /dev/sda
->=== START OF READ SMART DATA SECTION ===
->SMART overall-health self-assessment test result: PASSED
-```
+  ```sh
+  $ sudo smartctl -d sat -H /dev/sda
+  > === START OF READ SMART DATA SECTION ===
+  > SMART overall-health self-assessment test result: PASSED
+  ```
 
-* We can get more information of individual attributes used for the test. 
+* You can get more information of individual attributes used for the test. 
 --all (or -a) will list various attributes and give them a score based on online tests. 
-The attribute to look at are #5 Reallocated_Sector_Ct, #187 Reported_Uncorrest, and #233 Media_Wearout_Indicator.
+The attribute to look at are #5 Reallocated_Sector_Ct, #187 Reported_Uncorrest.
 VALUES go from a score of 0 (worst) to 100 (best). We want RAW_VALUES for #5 and 187 to be 0.
-```bash
-$ sudo smartctl -a /dev/sda
-> [...]
-> ID# ATTRIBUTE_NAME          FLAG     VALUE WORST THRESH TYPE      UPDATED  WHEN_FAILED RAW_VALUE
-> 5 Reallocated_Sector_Ct   0x0032   100   100   000    Old_age   Always       -       0
-> [...]
-> 187 Reported_Uncorrect      0x0032   100   100   000    Old_age   Always       -       0
-> [...]
-> 233 Media_Wearout_Indicator 0x0032   100   100   ---    Old_age   Always       -       1141
-> SMART Error Log Version: 1
-> No Errors Logged
-> [...]
 
-* The test above is simply based on the device characteristics (power on hours, temperature, etc) and on reported errors for the past day-to-day activity (reallocated sectors etc). However, tests can be run that specifically checks the electrical and mechanical properties of the disk and also some amount of disk read testing and data verification. The tests can be either a short test (maximum two minutes) or, if the read/verify test is done on the entire disk rather than a small portion of the disk, a long test (several hours).
-To check the estimated duration of each test we can use the --capabilities (or -c) option
+  ```sh
+  $ sudo smartctl -a /dev/sda
+  > [...]
+  > ID# ATTRIBUTE_NAME          FLAG     VALUE WORST THRESH TYPE      UPDATED  WHEN_FAILED RAW_VALUE
+  > 5 Reallocated_Sector_Ct     0x0032   100   100   000    Old_age   Always       -       0
+  > [...]
+  > 187 Reported_Uncorrect      0x0032   100   100   000    Old_age   Always       -       0
+  > [...]
+  > SMART Error Log Version: 1
+  > No Errors Logged
+  > [...]
+  ```
 
-```bash
-$ sudo smartctl -c /dev/sda
-> [...]
-> Short self-test routine 
-recommended polling time:        (   2) minutes.
-> Extended self-test routine
-recommended polling time:        ( 182) minutes.
-```
+* The test above is simply based on the device characteristics (power on hours, temperature, etc) and on reported errors for the past activity (reallocated sectors etc). However, tests can be run that specifically checks the electrical and mechanical properties of the disk and also some amount of disk read testing and data verification. The tests can be either a short test (maximum two minutes) or, if the read/verify test is done on the entire disk rather than a small portion of the disk, a long test (several hours).
+
+* To check the estimated duration of each test we can use the --capabilities (or -c) option
+
+  ```sh
+  $ sudo smartctl -c /dev/sda
+  > [...]
+  > Short self-test routine 
+  recommended polling time:        (   2) minutes.
+  > Extended self-test routine
+  recommended polling time:        ( 182) minutes.
+  ```
 
 * We can now do a short test that should last 2 minutes or less
 
-```bash
-$ sudo smartctl -t short /dev/sda
-```
+  ```sh
+  $ sudo smartctl -t short /dev/sda
+  ```
 
 * Wait at least two minutes and then check the results.
-If all goes well, we should see a 'Completed without error' status.
+If all goes well, you should see a 'Completed without error' status.
 
-```bash
-$ sudo smartctl -l selftest /dev/sda
-> smartctl 6.6 2017-11-05 r4594 [aarch64-linux-5.10.52-v8+] (local build)
-> Copyright (C) 2002-17, Bruce Allen, Christian Franke, www.smartmontools.org
->
-> === START OF READ SMART DATA SECTION ===
-> SMART Self-test log structure revision number 1
-> Num  Test_Description    Status                  Remaining  LifeTime(hours)  LBA_of_first_error
-> # 1  Short offline       Completed without error       00%      1698         -
-```
+  ```sh
+  $ sudo smartctl -l selftest /dev/sda
+  > smartctl 6.6 2017-11-05 r4594 [aarch64-linux-5.10.52-v8+] (local build)
+  > Copyright (C) 2002-17, Bruce Allen, Christian Franke, www.smartmontools.org
+  >
+  > === START OF READ SMART DATA SECTION ===
+  > SMART Self-test log structure revision number 1
+  > Num  Test_Description    Status                  Remaining  LifeTime(hours)  LBA_of_first_error
+  > # 1  Short offline       Completed without error       00%      1698         -
+  ```
 
 * If you want to read more about Smartmontools utilities and their options, you can read the manual: `$ man smartctl`
 
-## Regular checks using the smartd daemon
+---
+
+### Regular checks using the smartd daemon
 
 `smartd` is a daemon that runs SMART tests on devices very 30 minutes (by default). Here, we will set up `smartd` to run every 30 minutes and will display a summary of the results in the RaspiBolt system overview (motd).
 
-### Setting up the mailbox and email utility
+#### Autostart on boot
+
+* First, back up the default configuration file
+
+  ```sh
+  $ sudo cp /etc/smartd.conf /etc/smartd.conf.bak
+  $ sudo nano /etc/smartd.conf
+  $ killall -HUP smartd
+  ```
+
+killall -HUP smartd
+
+
+#### Setting up the mailbox and email utility
 
 * Open the smartd configuration file
 
