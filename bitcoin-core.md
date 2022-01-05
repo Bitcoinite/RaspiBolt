@@ -196,6 +196,17 @@ We'll also set the proper access permissions.
 
   🔍 *more: [configuration options](https://en.bitcoin.it/wiki/Running_Bitcoin#Command-line_arguments){:target="_blank"} in Bitcoin Wiki*
 
+*Note:* By default, Bitcoin Core does not validate the entire chain history. To improve performance, the verification starts only a year or two before the present-day tip of the chain. As Jameson Lopp's put it very well:
+
+  > This is done under the assumption that if a year or more of proof of work has accumulated on top of those blocks, it’s highly unlikely that you are being fed fraudulent signatures that no one else has verified, and if you are then something is incredibly wrong and the security assumptions underlying the system are likely compromised. ([Source](https://blog.keys.casa/bitcoin-full-validation-sync-performance/){:target="_blank"})
+
+* *Optional:* If you want to truly verify the entire chain and adhere to the "don't trust, verify" motto, you can add the following option at the end of `bitcoin.conf`. Save and exit. But expect a longer IBD time!
+
+  ```sh
+  # Verify the entire chain from the genesis block
+  assumevalid=0 
+  ```
+
 * Set permissions: only the user 'bitcoin' and members of the 'bitcoin' group can read it
 
   ```sh
