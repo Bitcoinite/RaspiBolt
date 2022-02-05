@@ -180,6 +180,42 @@ This can be done by configuring the DHCP-Client (on the Pi) to advertise a stati
 3. Restart networking system
   `sudo /etc/init.d/networking restart`
 
+---
+
+## What programs are you running on the RaspiBolt?
+
+An installation of all the programs from the main guide (i.e. excluding any bonus guides) would comprises the following programs:
+
+* Raspberry Pi OS Lite 64-bit default packages
+  * 520 packages, the full list is available here: [https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2022-01-28/2022-01-28-raspios-bullseye-arm64-lite.info](https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2022-01-28/2022-01-28-raspios-bullseye-arm64-lite.info){:target="_blank"}
+
+* apt packages installed manually in the guide
+  * `cargo`     # for installing electrs
+  * `clang`     # for installing electrs
+  * `cmake`     # for installing electrs
+  * `fail2ban`  # for security
+  * `git`       # for installing electrs, BTC RPC Explorer and RTL
+  * `hdparm`    # for drive performance
+  * `nginx`     # for security
+  * `nodejs`    # for installing BTC RPC Explorer and RTL
+  * `tor`       # for privacy
+  * `ufw`       # for security
+
+* /usr/local/bin binaries 
+  * *For Bitcoin Core*
+    * `bitcoin-cli`
+    * `bitcoin-qt`
+    * `bitcoin-tx`
+    * `bitcoin-util`
+    * `bitcoin-wallet`
+    * `bitcoind`
+    * `test_bitcoin`
+  * *For Electrum Server in Rust*
+    * `electrs`
+  * *For LND*
+    * `lncli`
+    * `lnd`
+
 ------
 
 << Back: [Troubleshooting](troubleshooting.md)
