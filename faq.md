@@ -201,21 +201,6 @@ An installation of all the programs from the main guide (i.e. excluding any bonu
   * `tor`       # for privacy
   * `ufw`       # for security
 
-* /usr/local/bin binaries 
-  * *For Bitcoin Core*
-    * `bitcoin-cli`
-    * `bitcoin-qt`
-    * `bitcoin-tx`
-    * `bitcoin-util`
-    * `bitcoin-wallet`
-    * `bitcoind`
-    * `test_bitcoin`
-  * *For Electrum Server in Rust*
-    * `electrs`
-  * *For LND*
-    * `lncli`
-    * `lnd`
-
-------
+---
 
 << Back: [Troubleshooting](troubleshooting.md)
