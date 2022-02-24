@@ -36,6 +36,9 @@ has_toc: false
 * **[Zeus (Android)](zeus-over-tor.md)** - connect to your node over VPN or Tor, make payments with lightning or on-chain, manage your channels, and more
 * **[Zap (iOS)](zap-ios.md)** - a neat interface to manage peers & channels, make payments and create invoices
 
+### *GUI - Web*
+* **[ThunderHub](thunderhub.md)** - a browser interface to manage all parts of your LN node like forwarding fees, channel opening/closing, usage of lnurl and much more.
+
 ---
 
 ## Liquidity management (rebalancing)
