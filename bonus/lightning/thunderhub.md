@@ -6,6 +6,7 @@ grand_parent: Bonus Section
 nav_exclude: true
 has_toc: false
 ---
+
 # Bonus Guide: Install ThunderHub
 {: .no_toc }
 
@@ -41,14 +42,38 @@ Table of contents
   $ node -v
   > v16.13.2
   ```
+
 * If the version is v14.15 or above, you can move to the next section. If Node.js is not installed, follow [this guide](https://raspibolt.org/btcrpcexplorer.html#install-nodejs){:target="_blank"} to install it.
 
-### Firewall 
+### Firewall & reverse proxy
 
-* Configure firewall to allow incoming HTTP requests from your local network to the web server.
+* Enable NGINX reverse proxy to route external encrypted HTTPS traffic internally to ThunderHub
 
   ```sh
-  $ sudo ufw allow from 192.168.0.0/16 to any port 3010 comment 'allow ThunderHub from local network'
+  $ sudo nano /etc/nginx/streams-enabled/thunderhub-reverse-proxy.conf
+  ```
+
+  ```sh
+  upstream rtl {
+    server 127.0.0.1:3000;
+  }
+  server {
+    listen 4001 ssl;
+    proxy_pass rtl;
+  }
+  ```
+
+* Test and reload NGINX configuration
+
+  ```sh
+  $ sudo nginx -t
+  $ sudo systemctl reload nginx
+  ```
+
+* Configure firewall to allow incoming HTTPS requests
+
+  ```sh
+  $ sudo ufw allow 4010/tcp comment 'allow TunderHub SSL'
   $ sudo ufw status
   ```
   
