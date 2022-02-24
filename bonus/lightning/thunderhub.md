@@ -32,6 +32,13 @@ Table of contents
 
 ---
 
+## Requirements
+
+* Node.js v14.15+
+* NPM
+
+---
+
 ## Preparations
 
 ### Check Node.js
@@ -81,11 +88,10 @@ Table of contents
 
 ## ThunderHub
 
-### Installation
+### Data directory
 
-We do not want to run the thunderhub code alongside `bitcoind` and `lnd` because of security reasons.
+We do not want to run ThunderHub alongside `bitcoind` and `lnd` because of security reasons.
 For that we will create a separate user and we will be running the code as the new user.
-We are going to install thunderhub in the home directory since it doesn't take much space.
 
 * Create a new "thunderhub" user. The new user needs read-only access to the `tls.cert` and our `admin.macaroon`, 
   so we add him to the "lnd" group. Open a new session.
@@ -101,61 +107,48 @@ We are going to install thunderhub in the home directory since it doesn't take m
   ```sh
   $ git clone https://github.com/apotdevin/thunderhub.git
   $ cd thunderhub
-  $ npm install
-  $ npm run build
   ```
 
 ### Configuration
 
-* Still with user "thunderhub", edit the configuration file.
+By default, ThunderHub is configured to favour privacy over functionality.
+
+* Still with user "thunderhub", make a local copy of the configuration file that will be preserved during future updates.
 
   ```sh
   $ cp ~/thunderhub/.env ~/thunderhub/.env.local
-  $ nano ~/thunderhub/.env
+  $ nano ~/thunderhub/.env.local
   ```
 
-* Uncomment the following lines, save and exit:
+* By default, ThunderHub runs on port 3000 which is already allocated to Ride The Lightning. 
+Add the following line at the end of the "Server Configs" section to use port 3010 instead.
 
   ```ini
-  # -----------
-  # Server Configs
-  # -----------
-  LOG_LEVEL='debug'
-
-  # -----------
-  # Interface Configs
-  # -----------
-  THEME='dark'
-
-  # -----------
-  # Account Configs
-  # -----------
-  ACCOUNT_CONFIG_PATH='/home/thunderhub/thunderhub/thubConfig.yaml'
+  BASE_PATH = 'http://localhost:3010'
   ```
 
-* If not already done, change your directory and edit your `thubConfig.yaml`. Change your `accountpassword`.
+* Add the following line at the end of the URLs section to use our own self-hosted blockchain explorer. Save and exit.
+
+  ```ini
+  MEMPOOL_URL='https://raspibolt.local:4000/'
+  ---
+
+* 
+
+### Installation
+
+* Still with user "ThunderHub" and still inside `~/thunderhub`, install ThunderHub
 
   ```sh
-  $ cd thunderhub
-  $ nano thubConfig.yaml 
+  $ npm install
+  $ npm run build
   ```
-  ```ini
-  masterPassword: 'PASSWORD' # Default password unless defined in account
-  accounts:
-    - name: 'RaspiBolt'
-      serverUrl: '127.0.0.1:10009'
-      macaroonPath: '/home/bitcoin/.lnd/data/chain/bitcoin/mainnet/admin.macaroon'
-      certificatePath: '/home/bitcoin/.lnd/tls.cert'
-      password: 'accountpassword'
-  ```
-
----
 
 ## First Start
 
-Test starting thunderhub manually first to make sure it works.
+Test starting ThunderHub manually first to make sure it works.
 
-* Let's do a first start to make sure it's running as expected.
+* Let's do a first start to make sure it's running as expected. 
   Make sure we are in the thunderhub directory and start the web server.
 
  ```
@@ -163,7 +156,7 @@ Test starting thunderhub manually first to make sure it works.
   $ npm run start -p 3010
   ```
 
-* Now point your browser to `http://raspibolt.local:3010` (or whatever you chose as hostname) or the ip address (e.g. `http://192.168.0.20:3010`).
+* Now point your browser to `http://raspibolt.local:4002` (or whatever you chose as hostname) or the ip address (e.g. `http://192.168.0.20:4002`).
   You should see the home page of ThunderHub.
 
 * If you see a lot of errors on the RaspiBolt command line, then you have to change file permissions maybe,  
