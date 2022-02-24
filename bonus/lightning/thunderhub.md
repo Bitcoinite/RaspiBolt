@@ -55,10 +55,10 @@ Table of contents
 
   ```sh
   upstream rtl {
-    server 127.0.0.1:3000;
+    server 127.0.0.1:3010;
   }
   server {
-    listen 4001 ssl;
+    listen 4002 ssl;
     proxy_pass rtl;
   }
   ```
@@ -73,7 +73,7 @@ Table of contents
 * Configure firewall to allow incoming HTTPS requests
 
   ```sh
-  $ sudo ufw allow 4010/tcp comment 'allow TunderHub SSL'
+  $ sudo ufw allow 4002/tcp comment 'allow TunderHub SSL'
   $ sudo ufw status
   ```
   
