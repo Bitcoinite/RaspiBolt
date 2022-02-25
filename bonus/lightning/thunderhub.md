@@ -94,12 +94,22 @@ We do not want to run ThunderHub alongside `bitcoind` and `lnd` because of secur
 For that we will create a separate user and we will be running the code as the new user.
 
 * Create a new "thunderhub" user. The new user needs read-only access to the `tls.cert` and our `admin.macaroon`, 
-  so we add him to the "lnd" group. Open a new session.
+  so we add him to the "lnd" group. We also create a data directory to store the configuration files.
 
   ```sh
   $ sudo adduser --disabled-password --gecos "" thunderhub
   $ sudo adduser thunderhub lnd
+  $ sudo mkdir /data/thunderhub
+  $ sudo chown thunderhub:thunderhub /data/thunderhub
+  $ sudo cp /data/lnd/data/chain/bitcoin/mainnet/admin.macaroon /home/thunderhub/admin.macaroon
+  $ sudo chown thunderhub:thunderhub /home/thunderhub/admin.macaroon
+  ```
+
+* Log in with the "thunderhub" user and create a link to the LND data directory
+
+  ```sh
   $ sudo su - thunderhub
+  $ ln -s /data/lnd /home/thunderhub/.lnd
   ```
 
 * Download the source code directly from GitHub and install all dependencies using NPM.
@@ -116,15 +126,17 @@ By default, ThunderHub is configured to favour privacy over functionality.
 * Still with user "thunderhub", make a local copy of the configuration file that will be preserved during future updates.
 
   ```sh
-  $ cp ~/thunderhub/.env ~/thunderhub/.env.local
+  $ cp ~/thunderhub/.env /data/thunderhub/.env.local
+  $ ln -s /data/thunderhub/.env.local ~/thunderhub/.env.local
   $ nano ~/thunderhub/.env.local
   ```
 
-* By default, ThunderHub runs on port 3000 which is already allocated to Ride The Lightning. 
-Add the following line at the end of the "Server Configs" section to use port 3010 instead.
+* Paste the following configuration settings
+
+
 
   ```ini
-  BASE_PATH = 'http://localhost:3010'
+  PORT=3010
   ```
 
 * Add the following line at the end of the URLs section to use our own self-hosted blockchain explorer. Save and exit.
@@ -133,7 +145,29 @@ Add the following line at the end of the "Server Configs" section to use port 30
   MEMPOOL_URL='https://raspibolt.local:4000/'
   ---
 
-* 
+* In "Accounts config", add the location of the server accounts configuration file
+
+  ```ini
+  ACCOUNT_CONFIG_PATH='/data/thunderhub/thubConfig.yaml'
+  ```
+
+* Create the server account YAML file and restricts its read permission to the "thunderhub" user only
+
+  ```sh
+  $ nano /data/thunderhub/thubConfig.yaml
+  $ chmod 600 /mnt/hdd/app-data/thunderhub/thubConfig.yaml
+  ```
+
+* Paste the following configuration. Paste your ThunderHub password. Save and exit.
+
+  ```ini
+  masterPassword:"YourStrongThunderHubPassword"
+  accounts:
+  - name: "RaspiBolt"
+    serverUrl: "127.0.0.1:10009"
+    macaroonPath: ".lnd/data/chain/bitcoin/mainnet/admin.macaroon"
+    certificatePath: "~/.lnd/tls.cert"
+  ```
 
 ### Installation
 
@@ -142,6 +176,7 @@ Add the following line at the end of the "Server Configs" section to use port 30
   ```sh
   $ npm install
   $ npm run build
+  $ npm prune --production
   ```
 
 ## First Start
@@ -156,7 +191,7 @@ Test starting ThunderHub manually first to make sure it works.
   $ npm run start -p 3010
   ```
 
-* Now point your browser to `http://raspibolt.local:4002` (or whatever you chose as hostname) or the ip address (e.g. `http://192.168.0.20:4002`).
+* Now point your browser to [https://raspibolt.local:4002](http://raspibolt.local:4002){:target="_blank"} (or whatever you chose as hostname) or the ip address (e.g. `http://192.168.0.20:4002`).
   You should see the home page of ThunderHub.
 
 * If you see a lot of errors on the RaspiBolt command line, then you have to change file permissions maybe,  
@@ -184,23 +219,21 @@ In order to do that we create a systemd unit that starts the service on boot dir
 * Paste the following configuration. Save and exit.
 
   ```ini
-  # RaspiBolt: systemd unit for Thunderhub
+  # RaspiBolt: systemd unit for ThunderHub
   # /etc/systemd/system/thunderhub.service
 
   [Unit]
-  Description=Thunderhub
-  Wants=lnd.service
-  After=network.target lnd.service
+  Description=ThunderHub
+  After=lnd.service
 
   [Service]
   WorkingDirectory=/home/thunderhub/thunderhub
   ExecStart=/usr/bin/npm run start -p 3010
   User=thunderhub
+  
   Restart=always
   TimeoutSec=120
   RestartSec=30
-  StandardOutput=null
-  StandardError=journal
 
   [Install]
   WantedBy=multi-user.target
@@ -209,12 +242,20 @@ In order to do that we create a systemd unit that starts the service on boot dir
 * Enable the service, start it and check log logging output.
 
   ```sh
-  $ sudo systemctl enable thunderhub.service
-  $ sudo systemctl start thunderhub.service
+  $ sudo systemctl enable thunderhub
+  $ sudo systemctl start thunderhub
   $ sudo journalctl -f -u thunderhub
   ```
 
-* You can now access ThunderHub from within your local network by browsing to <http://raspibolt.local:3010> (or your equivalent ip address).
+* You can now access ThunderHub from within your local network by browsing to [https://raspibolt.local:3010](http://raspibolt.local:4002){:target="_blank"} (or your equivalent IP address).
+
+### Security
+
+We recommend setting up 2FA (e.g., with the FOSS [Aegis](https://getaegis.app/){:target="_blank"} app)
+
+* Open ThunderHub and click on the "Settings" cogwheel (top right corner)
+* Go to the "Security" and enable 2FA.
+* For better privacy, do not scan the QR code but enter the secret code manually in your 2FA app
 
 ---
 
@@ -252,7 +293,7 @@ You now have the BTC RPC Explorer running to check the Bitcoin network informati
 
 ---
 
-## Upgrade
+## Update
 
 Updating to a [new release](https://github.com/apotdevin/thunderhub/releases) should be straight-forward.
 
@@ -279,8 +320,55 @@ Updating to a [new release](https://github.com/apotdevin/thunderhub/releases) sh
   $ sudo systemctl start thunderhub
   ```
   
-  <br /><br />
-  
 ---
 
+## Uninstall
+
+* Stop and delete the systemd sevice
+
+  ```sh
+  $ sudo systemctl stop thunderhub
+  $ sudo rm /etc/systemd/system/thunderhub.service
+  ```
+
+* With the "root" user, delete the "thunderhub" user. Exit the "root" user session and go back to "admin".
+
+  ```sh
+  $ sudo su - 
+  $ userdel -r thunderhub
+  $ exit
+  ```
+
+* Display the UFW rule numbers for ThunderHub (e.g. below, X and Y) and delete them
+
+  ```sh
+  $ sudo ufw status numbered
+  > [...]
+  > [X] 4002/tcp                   ALLOW IN    Anywhere                   # allow TunderHub SSL
+  > [Y] 4002/tcp (v6)              ALLOW IN    Anywhere (v6)              # allow TunderHub SSL
+  $ sudo ufw delete [Y]
+  $ sudo ufw delete [X]
+  $ sudo ufw status
+  ```
+
+* Delete the ThunderHub data directory
+
+  ```sh
+  $ sudo rm -r /data/thunderhub
+  ```
+
+* Remove the ThunderHub reverse proxy server file and reload NGINX
+
+  ```sh
+  $ sudo rm /etc/nginx/streams-enabled/thunderhub-reverse-proxy.conf
+  $ sudo nginx -t
+  $ sudo systemctl reload nginx
+  ``` 
+
+---
+
+
+<br /><br />
+  
+  
 <<Back: [+ Lightning](index.md)
