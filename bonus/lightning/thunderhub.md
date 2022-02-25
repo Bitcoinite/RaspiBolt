@@ -93,16 +93,19 @@ Table of contents
 We do not want to run ThunderHub alongside `bitcoind` and `lnd` because of security reasons.
 For that we will create a separate user and we will be running the code as the new user.
 
-* Create a new "thunderhub" user. The new user needs read-only access to the `tls.cert` and our `admin.macaroon`, 
-  so we add him to the "lnd" group. We also create a data directory to store the configuration files.
+* Create a new "thunderhub" user and copy the LND credentials
 
   ```sh
   $ sudo adduser --disabled-password --gecos "" thunderhub
-  $ sudo adduser thunderhub lnd
-  $ sudo mkdir /data/thunderhub
-  $ sudo chown thunderhub:thunderhub /data/thunderhub
   $ sudo cp /data/lnd/data/chain/bitcoin/mainnet/admin.macaroon /home/thunderhub/admin.macaroon
   $ sudo chown thunderhub:thunderhub /home/thunderhub/admin.macaroon
+  ```
+
+* Create a data directory to store the configuration files
+
+  ```sh
+  $ sudo mkdir /data/thunderhub
+  $ sudo chown thunderhub:thunderhub /data/thunderhub
   ```
 
 * Log in with the "thunderhub" user and create a link to the LND data directory
@@ -121,7 +124,7 @@ For that we will create a separate user and we will be running the code as the n
 
 ### Configuration
 
-By default, ThunderHub is configured to favour privacy over functionality.
+We set up the program and user account configuration files.
 
 * Still with user "thunderhub", make a local copy of the configuration file that will be preserved during future updates.
 
@@ -131,21 +134,20 @@ By default, ThunderHub is configured to favour privacy over functionality.
   $ nano ~/thunderhub/.env.local
   ```
 
-* Paste the following configuration settings
-
-
+* In the "Server config" section, add the following two lines at the end. It enables the use of our Tor Proxy server for external links and to use port 3010 as the default port 3000 is already used for Ride The Lightning.
 
   ```ini
+  TOR_PROXY_SERVER=socks://127.0.0.1:9050
   PORT=3010
   ```
 
-* Add the following line at the end of the URLs section to use our own self-hosted blockchain explorer. Save and exit.
+* In the "URLs" section, add the following line at the end. It enables the use our own self-hosted blockchain explorer for better privacy.
 
   ```ini
   MEMPOOL_URL='https://raspibolt.local:4000/'
   ---
 
-* In "Accounts config", add the location of the server accounts configuration file
+* In the "Accounts config" section, uncomment the `ACCOUNT_CONFIG_PATH` option and set the path to `/data/thunderhub/thubConfig.yaml`. Save and exit.
 
   ```ini
   ACCOUNT_CONFIG_PATH='/data/thunderhub/thubConfig.yaml'
@@ -155,7 +157,7 @@ By default, ThunderHub is configured to favour privacy over functionality.
 
   ```sh
   $ nano /data/thunderhub/thubConfig.yaml
-  $ chmod 600 /mnt/hdd/app-data/thunderhub/thubConfig.yaml
+  $ chmod 600 /data/thunderhub/thubConfig.yaml
   ```
 
 * Paste the following configuration. Paste your ThunderHub password. Save and exit.
@@ -163,9 +165,9 @@ By default, ThunderHub is configured to favour privacy over functionality.
   ```ini
   masterPassword:"YourStrongThunderHubPassword"
   accounts:
-  - name: "RaspiBolt"
-    serverUrl: "127.0.0.1:10009"
-    macaroonPath: ".lnd/data/chain/bitcoin/mainnet/admin.macaroon"
+  - name: RaspiBolt
+    serverUrl: 127.0.0.1:10009
+    macaroonPath: "~/.lnd/data/chain/bitcoin/mainnet/admin.macaroon"
     certificatePath: "~/.lnd/tls.cert"
   ```
 
@@ -186,7 +188,7 @@ Test starting ThunderHub manually first to make sure it works.
 * Let's do a first start to make sure it's running as expected. 
   Make sure we are in the thunderhub directory and start the web server.
 
- ```
+ ```sh
   $ cd ~/thunderhub
   $ npm run start -p 3010
   ```
@@ -194,12 +196,9 @@ Test starting ThunderHub manually first to make sure it works.
 * Now point your browser to [https://raspibolt.local:4002](http://raspibolt.local:4002){:target="_blank"} (or whatever you chose as hostname) or the ip address (e.g. `http://192.168.0.20:4002`).
   You should see the home page of ThunderHub.
 
-* If you see a lot of errors on the RaspiBolt command line, then you have to change file permissions maybe,  
-  because thunderhub can't "access" the `.lnd` directory.
-
 * Stop ThunderHub in the terminal with `Ctrl`-`C` and exit the "thunderhub" user session.
 
-  ```
+  ```sh
   $ exit
   ```
 
