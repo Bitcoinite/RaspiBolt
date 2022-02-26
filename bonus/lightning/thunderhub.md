@@ -41,13 +41,15 @@ Table of contents
 
 ## Preparations
 
-### Check Node.js
+### Check Node.js and npm
 
-* Node.js v16 should have been installed for the BTC RPC Explorer and RTL. We can check our version of Node.js with user "admin": 
+* Node.js v16 and npm should have been installed for the BTC RPC Explorer or RTL. We can check our version of Node.js with user "admin": 
   
   ```sh
   $ node -v
   > v16.13.2
+  npm --version
+  > v8.3.1
   ```
 
 * If the version is v14.15 or above, you can move to the next section. If Node.js is not installed, follow [this guide](https://raspibolt.org/btcrpcexplorer.html#install-nodejs){:target="_blank"} to install it.
@@ -97,7 +99,7 @@ For that we will create a separate user and we will be running the code as the n
 
   ```sh
   $ sudo adduser --disabled-password --gecos "" thunderhub
-  $ sudo cp /data/lnd/data/chain/bitcoin/mainnet/admin.macaroon /home/thunderhub/admin.macaroon
+  $ sudo cp ~/.lnd/data/chain/bitcoin/mainnet/admin.macaroon /home/thunderhub/admin.macaroon
   $ sudo chown thunderhub:thunderhub /home/thunderhub/admin.macaroon
   ```
 
@@ -146,6 +148,16 @@ We set up the program and user account configuration files.
   ```ini
   MEMPOOL_URL='https://raspibolt.local:4000/'
   ---
+
+* We can enable the fetching of the bitcoin price and miner fees because we enabled the Tor proxy server which ThunderHub will use to privately make the requests. However, we disable external  In the "Privacy" section, add the following lines at the end. You might also want to enable external links
+
+  ```ini
+  FETCH_PRICES=true 
+  FETCH_FEES=true
+  DISABLE_LINKS=true
+  DISABLE_LNMARKETS=true
+  NO_VERSION_CHECK=true
+  ```
 
 * In the "Accounts config" section, uncomment the `ACCOUNT_CONFIG_PATH` option and set the path to `/data/thunderhub/thubConfig.yaml`. Save and exit.
 
