@@ -179,8 +179,8 @@ We set up the program and user account configuration files.
   accounts:
   - name: RaspiBolt
     serverUrl: 127.0.0.1:10009
-    macaroonPath: "~/.lnd/data/chain/bitcoin/mainnet/admin.macaroon"
-    certificatePath: "~/.lnd/tls.cert"
+    macaroonPath: "/home/thunderhub/admin.macaroon"
+    certificatePath: "/data/lnd/tls.cert"
   ```
 
 ### Installation
@@ -262,11 +262,14 @@ In order to do that we create a systemd unit that starts the service on boot dir
 
 ### Security
 
-We recommend setting up 2FA (e.g., with the FOSS [Aegis](https://getaegis.app/){:target="_blank"} app)
+We recommend setting up 2FA (e.g., with the FOSS app [Aegis](https://getaegis.app/){:target="_blank"}).
 
 * Open ThunderHub and click on the "Settings" cogwheel (top right corner)
 * Go to the "Security" and enable 2FA.
 * For better privacy, do not scan the QR code but enter the secret code manually in your 2FA app
+
+**Congratulations!**
+You now have ThunderHub running to manage your Lightning service on our own node.
 
 ---
 
@@ -296,17 +299,14 @@ You can easily do so by adding a Tor hidden service on the RaspiBolt and accessi
   > abcdefg..............xyz.onion
   ```
 
-* With the [Tor browser](https://www.torproject.org), you can access this onion address from any device.
+* With the [Tor browser](https://www.torproject.org){:target="_blank"}, you can access this onion address from any device.
   Please be aware that this access is not password protected and should not be shared widely.
-
-**Congratulations!**
-You now have the BTC RPC Explorer running to check the Bitcoin network information directly from your node.
 
 ---
 
 ## Update
 
-Updating to a [new release](https://github.com/apotdevin/thunderhub/releases) should be straight-forward.
+Updating to a [new release](https://github.com/apotdevin/thunderhub/releases){:target="_blank"} should be straight-forward.
 
 * From user "admin", stop the service and open a "thunderhub" user session.
 
