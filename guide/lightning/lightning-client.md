@@ -10,6 +10,8 @@ parent: Lightning
 
 We set up [LND](https://github.com/lightningnetwork/lnd/blob/master/README.md){:target="_blank"}, the Lightning Network Daemon by [Lightning Labs](https://lightning.engineering/){:target="_blank"}.
 
+[SLP 39](https://stephanlivera.com/episode/39/){: .btn target="_blank"}
+
 ---
 
 ## Table of contents
