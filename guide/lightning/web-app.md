@@ -12,7 +12,7 @@ We install [Ride The Lightning](https://github.com/Ride-The-Lightning/RTL#readme
 
 ![Ride The Lightning dashboard](../../images/rtl-homepage.png)
 
-[SLP 135](https://stephanlivera.com/episode/135/){: .btn target="_blank"}
+🔊 [SLP 135](https://stephanlivera.com/episode/135/){: .btn target="_blank"}
 
 ---
 
