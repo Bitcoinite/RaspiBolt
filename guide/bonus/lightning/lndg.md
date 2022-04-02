@@ -7,7 +7,7 @@ nav_exclude: true
 has_toc: false
 ---
 
-# Bonus guide: LNDg
+# Bonus guide: LNDg (draft TBD)
 {: .no_toc }
 
 ---

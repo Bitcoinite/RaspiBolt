@@ -36,7 +36,7 @@ has_toc: false
 * **[Zap (iOS)](zap-ios.md)** - a neat interface to manage peers & channels, make payments and create invoices
 
 #### *GUI - Web*
-* **[LNDg]
+* **[LNDg](lndg.md)** - a web-based node management tool for power users with automation features to rebalance, update fees and find new peers
 
 ---
 
