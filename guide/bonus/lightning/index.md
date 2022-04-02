@@ -37,6 +37,7 @@ has_toc: false
 
 #### *GUI - Web*
 * **[LNDg](lndg.md)** - a web-based node management tool for power users with automation features to rebalance, update fees and find new peers
+* **[ThunderHub](thunderhub.md)** - a slick web-based node management app
 
 ---
 
@@ -48,17 +49,6 @@ has_toc: false
 
 ## Fee management
 * **[charge-lnd](charge-lnd.md)** - a simple policy-based fee manager for LND
-
----
-
-## Even more Extras 
-
-### [RaspiBolt Extras by Rob Clark](https://github.com/robclark56/RaspiBolt-Extras/blob/master/README.md){:target="_blank"}
-
-* **[Lights-Out](https://github.com/robclark56/RaspiBolt-Extras/#the-lights-out-raspibolt){:target="_blank"}** - automatic unlocking of wallet and dynamic ip
-* **[RaspiBoltDuo](https://github.com/robclark56/RaspiBolt-Extras/#raspiboltduo){:target="_blank"}** - testnet & mainnet running simultaneously
-* **[Using REST access](https://github.com/robclark56/RaspiBolt-Extras/#using-rest-access){:target="_blank"}** - to enable and demonstrate using the REST interface instead of rpc/lncli
-* **[Receiving Lightning payments](https://github.com/robclark56/RaspiBolt-Extras/#receive-ln-payments){:target="_blank"}** - automatically create invoices / qr codes
 
 ---
 
