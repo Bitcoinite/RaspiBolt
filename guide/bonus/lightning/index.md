@@ -35,6 +35,9 @@ has_toc: false
 #### *GUI - Mobile*
 * **[Zap (iOS)](zap-ios.md)** - a neat interface to manage peers & channels, make payments and create invoices
 
+#### *GUI - Web*
+* **[LNDg]
+
 ---
 
 ## Liquidity management (rebalancing)

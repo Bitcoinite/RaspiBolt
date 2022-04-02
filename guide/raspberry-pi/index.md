@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Raspberry Pi
-nav_order: 20
+nav_order: 30
 has_children: true
 ---
 <!-- markdownlint-disable MD014 MD022 MD025 MD040 -->
