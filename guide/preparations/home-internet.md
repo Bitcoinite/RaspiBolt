@@ -1,11 +1,11 @@
 ---
 layout: default
-title: Security
-nav_order: 10
+title: Home internet
+nav_order: 20
 parent: Preparations
 ---
 <!-- markdownlint-disable MD014 MD022 MD025 MD033 MD040 -->
-# Security
+# Home internet
 {: .no_toc }
 
 We'll learn a few simple actions to take to increase the security of your home internet.
