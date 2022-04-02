@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Bitcoin
-nav_order: 30
+nav_order: 40
 has_children: true
 ---
 <!-- markdownlint-disable MD014 MD022 MD025 MD040 -->

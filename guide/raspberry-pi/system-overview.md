@@ -1,25 +1,18 @@
 ---
 layout: default
 title: System overview
-parent: + Raspberry Pi
-grand_parent: Bonus Section
-nav_exclude: true
-has_toc: false
+nav_order: 70
+parent: Raspberry Pi
 ---
+<!-- markdownlint-disable MD014 MD022 MD025 MD033 MD040 -->
 
-# Bonus guide: System overview
+# System overview
 {: .no_toc }
 
-To get a quick overview of the system status, you can use [a shell script](https://github.com/raspibolt/raspibolt/blob/master/resources/20-raspibolt-welcome){:target="_blank"} that gathers the most relevant data.
+To get a quick overview of the system status, you can use [RaspiBolt Pulse](https://github.com/VajraOfIndra/raspibolt-pulse){:target="_blank"}, a shell script that gathers the most relevant data.
 You can configure it to be shown on each login.
 
-Difficulty: Easy
-{: .label .label-green }
-
-Status: Tested v3
-{: .label .label-green }
-
-![MotD system overview](../../../images/system-overview.png)
+![RaspiBolt Pulse](../../images/raspibolt-pulse.png)
 
 ---
 
@@ -40,17 +33,15 @@ This script can be run by user "admin" without root privileges, but you should s
   $ cd /tmp/
 
   # RaspiBolt version 3 (current)
-  $ wget https://raw.githubusercontent.com/raspibolt/raspibolt/master/resources/20-raspibolt-welcome
+  $ wget https://raw.githubusercontent.com/VajraOfIndra/raspibolt-pulse/main/raspibolt-pulse.sh
 
-  # RaspiBolt v2 (deprecated) -- DON'T RUN THIS unless you run an old RaspiBolt version!
-  $ wget https://raw.githubusercontent.com/raspibolt/raspibolt/master/resources/20-raspibolt-welcome-v2 -O 20-raspibolt-welcome
   ```
 
 * Inspect the script to make sure it does not do bad things.
   Exit with `Ctrl`-`X`
 
   ```sh
-  $ nano 20-raspibolt-welcome --linenumbers
+  $ nano raspibolt-pulse.sh --linenumbers
   ```
 
 * If you use a network cable instead of a wifi connection, go to line 19 and change `wlan0` to `eth0`.
@@ -64,7 +55,7 @@ This script can be run by user "admin" without root privileges, but you should s
 * Install the script and make it executable
 
   ```sh
-  $ sudo mv 20-raspibolt-welcome /usr/local/bin/raspibolt
+  $ sudo mv raspibolt-pulse.sh /usr/local/bin/raspibolt
   $ sudo chmod +x /usr/local/bin/raspibolt
   ```
 
@@ -98,6 +89,6 @@ In earlier versions, the script was executed by the "Message of the day" mechani
 
 <br /><br />
 
-------
+---
 
-<< Back: [+ Raspberry Pi](index.md)
+Next: [Web dashboard>>](web-dashboard.md)
