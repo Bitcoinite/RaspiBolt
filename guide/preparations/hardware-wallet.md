@@ -2,7 +2,7 @@
 layout: default
 title: Hardware wallet
 nav_order: 40
-parent: Internet
+parent: Preparations
 ---
 <!-- markdownlint-disable MD014 MD022 MD025 MD033 MD040 -->
 # Hardware wallet
