@@ -479,7 +479,7 @@ echo -ne "\033[2K"
 printf "${color_grey}cpu temp: ${color_temp}%-2s°C${color_grey}  tx: %-10s storage:   ${color_storage}%-11s ${color_grey}  load: %s
 ${color_grey}up: %-10s  rx: %-10s 2nd drive: ${color_storage2nd}%-11s${color_grey}   available mem: ${color_ram}%sM
 ${color_yellow}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${color_green}                      ${color_yellow_bold}%-28s ${color_yellow_bold}%-24s
+${color_green}                     ${color_yellow_bold}%-27s ${color_yellow_bold}%-24s
 ${color_green}     .~~.   .~~.      ${bitcoind_color}%-4s ${color_grey}%-23s ${lnd_color}%-4s ${color_grey}%-20s
 ${color_green}    '. \ ' ' / .'     ${btcversion_color}%-26s ${lndversion_color}%-24s
 ${color_red}     .~ .~~~${color_yellow}.${color_red}.~.      ${color_grey}Sync    ${sync_color}%-18s ${alias_color}%-24s
@@ -501,7 +501,7 @@ ${color_grey}%s
 "${temp}" "${network_tx}" "${storage} free" "${load}" \
 "${uptime}" "${network_rx}" "${storage2nd}" "${ram_avail}" \
 "${btc_title}" "Lightning (LND)" \
-"${bitcoind_running}" "${uptime_bitcoind} "${lnd_running}" "${uptime_lnd} \
+"${bitcoind_running}" "${uptime_bitcoind}" "${lnd_running}" "${uptime_lnd} \
 "${btcversion}" "${lndversion}" \
 "${sync} ${sync_behind}" "${ln_alias}" \
 "${mempool} tx" "${ln_walletbalance}" \
