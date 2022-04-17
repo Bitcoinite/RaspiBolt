@@ -26,6 +26,7 @@ network_name="wlan0"
 color_red='\033[0;31m'
 color_green='\033[0;32m'
 color_yellow='\033[0;33m'
+color_yellow_bold='\e[1;33m '
 color_grey='\033[0;37m'
 
 # controlled abort on Ctrl-C
@@ -42,7 +43,6 @@ trap trap_ctrlC SIGINT SIGTERM
 usage() {
   echo "RaspiBolt Welcome: system status overview
 usage: bbb-cmd.sh [--help] [--mock]
-
 This script can be run on startup: make it executable and
 copy the script to /etc/update-motd.d/
 "
@@ -450,6 +450,14 @@ else
   fi
 fi
 
+# Gather services uptim
+# ------------------------------------------------------------------------------
+uptime_bitcoind="$(systemctl status bitcoind | grep Active | cut -d ';' -f 2 | sed s/'\w*$'//)"
+uptime_electrs="$(systemctl status electrs | grep Active | cut -d ';' -f 2 | sed s/'\w*$'//)"
+uptime_btcrpcexplorer="$(systemctl status btcrpcexplorer | grep Active | cut -d ';' -f 2 | sed s/'\w*$'//)"
+uptime_lnd="$(systemctl status lnd | grep Active | cut -d ';' -f 2 | sed s/'\w*$'//)"
+uptime_rtl="$(systemctl status rtl | grep Active | cut -d ';' -f 2 | sed s/'\w*$'//)"
+
 # Mockmode overrides data for documentation images
 # ------------------------------------------------------------------------------
 
@@ -471,35 +479,41 @@ echo -ne "\033[2K"
 printf "${color_grey}cpu temp: ${color_temp}%-2s°C${color_grey}  tx: %-10s storage:   ${color_storage}%-11s ${color_grey}  load: %s
 ${color_grey}up: %-10s  rx: %-10s 2nd drive: ${color_storage2nd}%-11s${color_grey}   available mem: ${color_ram}%sM
 ${color_yellow}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${color_green}     .~~.   .~~.      ${color_yellow}%-22s${bitcoind_color}%-4s${color_grey}   ${color_yellow}%-20s${lnd_color}%-4s
+${color_green}                      ${color_yellow_bold}%-28s ${color_yellow_bold}%-24s
+${color_green}     .~~.   .~~.      ${bitcoind_color}%-4s ${color_grey}%-23s ${lnd_color}%-4s ${color_grey}%-20s
 ${color_green}    '. \ ' ' / .'     ${btcversion_color}%-26s ${lndversion_color}%-24s
 ${color_red}     .~ .~~~${color_yellow}.${color_red}.~.      ${color_grey}Sync    ${sync_color}%-18s ${alias_color}%-24s
 ${color_red}    : .~.'${color_yellow}／/${color_red}~. :     ${color_grey}Mempool %-18s ${color_grey}฿%17s sat
 ${color_red}   ~ (  ${color_yellow}／ /_____${color_red}~    ${color_grey}Peers   %-22s ${color_grey}⚡%16s sat
 ${color_red}  ( : ${color_yellow}／____   ／${color_red} )                              ${color_grey}⏳%16s sat
-${color_red}   ~ .~ (  ${color_yellow}/ ／${color_red}. ~    ${color_yellow}%-20s${electrs_color}%-4s   ${color_grey}∑%17s sat
-${color_red}    (  : '${color_yellow}/／${color_red}:  )     ${electrsversion_color}%-26s ${color_grey}%s/%s channels
-${color_red}     '~ .~${color_yellow}°${color_red}~. ~'                                 ${color_grey}Channel.db size: ${color_green}%s
-${color_red}         '~'          ${color_yellow}%-20s${color_grey}${btcrpcexplorer_color}%-4s
-${color_red}                      ${btcrpcexplorerversion_color}%-24s   ${color_yellow}%-20s${rtl_color}%-4s
+${color_red}   ~ .~ (  ${color_yellow}/ ／${color_red}. ~    ${color_yellow_bold}%-24s   ${color_grey}∑%17s sat
+${color_red}    (  : '${color_yellow}/／${color_red}:  )     ${electrs_color}%-4s ${color_grey}%-23s
+${color_red}     '~ .~${color_yellow}°${color_red}~. ~'      ${electrsversion_color}%-26s ${color_grey}%s/%s channels
+${color_red}         '~'                                           ${color_grey}Channel.db size: ${color_green}%s
+${color_red}                      ${color_yellow_bold}%-20s
+${color_red}                      ${btcrpcexplorer_color}%-4s ${color_grey}%-23s
+${color_red}                      ${btcrpcexplorerversion_color}%-24s   ${color_yellow_bold}%-20s
+${color_red}                      ${rtl_color}%-4s ${color_grey}%-23s
 ${color_red}                                                 ${rtlversion_color}%-24s
-
 ${color_grey}For others to connect to this lightning node
 ${color_grey}%s
-
 " \
 "${temp}" "${network_tx}" "${storage} free" "${load}" \
 "${uptime}" "${network_rx}" "${storage2nd}" "${ram_avail}" \
-"${btc_title}" "${bitcoind_running}" "Lightning (LND)" "${lnd_running}" \
+"${btc_title}" "Lightning (LND)" \
+"${bitcoind_running}" "${uptime_bitcoind} "${lnd_running}" "${uptime_lnd} \
 "${btcversion}" "${lndversion}" \
 "${sync} ${sync_behind}" "${ln_alias}" \
 "${mempool} tx" "${ln_walletbalance}" \
 "${connections} (📥${inbound} /📤${outbound})" "${ln_channelbalance}" \
 "${ln_pendinglocal}" \
-"Electrum" "${electrs_running}" "${sum_balance}" \
+"Electrum" "${sum_balance}" \
+"${electrs_running}" "${uptime_electrs}" \
 "${electrsversion}" "${ln_channels_online}" "${ln_channels_total}" \
 "${channel_db_size}" \
-"Block Explorer" "${btcrpcexplorer_running}" \
-"${btcrpcexplorerversion}" "RTL" "${rtl_running}" \
+"Block Explorer" \
+"${btcrpcexplorer_running}" "${uptime_btcrpcexplorer}" \
+"${btcrpcexplorerversion}" "RTL" \
+"${rtl_running}" "${uptime_rtl}" \
 "${rtlversion}" \
 "${ln_connect_guidance}"
