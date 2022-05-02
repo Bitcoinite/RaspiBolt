@@ -35,10 +35,15 @@ has_toc: false
 #### *GUI - Mobile*
 * **[Zap (iOS)](zap-ios.md)** - a neat interface to manage peers & channels, make payments and create invoices
 
+#### *GUI, API - Web*
+* **[LNBits](lnbits.md)** - a lightning wallet/accounts system
+* **[ThunderHub](thunderhub.md)** - a browser interface to manage all parts of your LN node like forwarding fees, channel opening/closing, usage of lnurl and much more.
+
 ---
 
-## Liquidity management (rebalancing)
+## Liquidity management
 * **[Balance of Satoshis](balance-of-satoshis.md)** - a tool to rebalance your channels and set up a LN node monitoring Telegram bot
+* **[Lightning Terminal](lightning-terminal.md)** - a browser-based GUI for managing channel liquidity with Loop and Pool
 * **[rebalance-lnd](rebalance-lnd.md)** - a simple script to manage your channel liquidity by doing circular rebalancing
 
 ---
