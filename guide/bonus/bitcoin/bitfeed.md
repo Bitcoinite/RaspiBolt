@@ -43,19 +43,14 @@ Table of contents
 
 We install the programming language [Elixir](https://elixir-lang.org/){:target="_blank"}.
 
-* Add the Erlang Solutions software package to the package manager
+* Update the package index files and install the latest version of Elixir 
 
   ```sh
-  $ wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb
-  $ sudo dpkg -i erlang-solutions_2.0_all.deb
   $ sudo apt update
-  ```
-
-* Install the Erlang/OTP platform and all of its applications, then install Elixir
-
-  ```sh
-  $ sudo apt install esl-erlang
   $ sudo apt install elixir
+  $ elixir -v
+  > [...]
+  > Elixir 1.10.3 (compiled with Erlang/OTP 22)
   ```
 
 ### Firewall
@@ -81,6 +76,15 @@ For improved security, we create the new user "bitfeed" that will run the explor
   ```sh
   $ git clone https://github.com/bitfeed-project/bitfeed.git
   $ cd bitfeed
-  $ git checkout v2.3.1
-  $ exit
+  ```
+  
+### Server
+
+
+
+
+  ```sh
+  $ cd server
+  $ mix do deps.get
+  $ mix do deps.compile
   ```
