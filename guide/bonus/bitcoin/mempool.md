@@ -129,7 +129,7 @@ For improved security, we create the new user "mempool" that will run the Mempoo
   ```sh
   $ sudo su - mempool
   $ cd mempool/backend
-  $ npm install --prod
+  $ npm install --omit=dev
   $ npm run build
   ```
   
@@ -217,7 +217,7 @@ For improved security, we create the new user "mempool" that will run the Mempoo
   
   ```sh
   $ cd frontend
-  $ npm install --prod
+  $ npm install --omit=dev
   $ npm run build
   $ exit
   ```
