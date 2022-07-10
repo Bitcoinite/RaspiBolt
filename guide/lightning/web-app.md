@@ -102,24 +102,26 @@ We do not want to run Ride the Lightning alongside bitcoind and lnd because of s
   $ git clone https://github.com/Ride-The-Lightning/RTL.git
   $ cd RTL
 
-  $ git tag | sort --version-sort | tail -n 1
-  > v0.12.2
+  $ curl -s https://api.github.com/repos/Ride-The-Lightning/RTL/tags | jq -r '.[] | select(.name | test("rc") | not) | .name' | head -n 1
+  > v0.12.3
 
-  $ git checkout v0.12.2
+  $ git checkout v0.12.3
 
-  $ git verify-tag v0.12.2
+  $ git verify-tag v0.12.3
+  > gpg: Signature made Sun 01 May 2022 19:45:20 BST
+  > gpg:                using RSA key 3E9BD4436C288039CA827A9200C9E2BC2E45666F
   > gpg: Good signature from "saubyk (added uid) <39208279+saubyk@users.noreply.github.com>" [unknown]
   > gpg:                 aka "Suheb <39208279+saubyk@users.noreply.github.com>" [unknown]
   > gpg: WARNING: This key is not certified with a trusted signature!
   > gpg:          There is no indication that the signature belongs to the owner.
-  > Primary key fingerprint: 3E9B D443 6C28 8039 CA82  7A92 00C9 E2BC 2E45 666F
+  Primary key fingerprint: 3E9B D443 6C28 8039 CA82  7A92 00C9 E2BC 2E45 666F
   ```
 
 * Now install RTL through the Node Package Manager (NPM).
   Downloading all dependencies can sometimes be very slow, so be patient and let the process run its course.
 
   ```sh
-  $ npm install --only=prod
+  $ npm install --omit=dev
   ```
 
 The installation can take some time, and can hang on a single package for a long time.
@@ -287,10 +289,10 @@ Make sure to read the release notes first.
   ```sh
   $ cd /home/rtl/RTL
   $ git fetch
-  $ git tag | sort --version-sort | tail -n 1
-  $ git checkout v0.12.2
-  $ git verify-tag v0.12.2
-  $ npm install --only=prod
+  $ curl -s https://api.github.com/repos/Ride-The-Lightning/RTL/tags | jq -r '.[] | select(.name | test("rc") | not) | .name' | head -n 1
+  $ git checkout v0.12.3
+  $ git verify-tag v0.12.3
+  $ npm install --omit=dev
   $ exit
   ```
 
